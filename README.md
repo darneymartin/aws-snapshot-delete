@@ -1,5 +1,5 @@
 # AWS-Snapshot-Delete
-A Python script used to batch delete AWS snapshots matching the supplied criteria. 
+A Python script used to batch delete AWS snapshots matching the supplied criteria.
 
 ## Usage Examples
 * `python3 delete_snapshots.py --verbose --age 7` - Show a list of all snapshots that are to be deleted, but not delete them
@@ -18,3 +18,4 @@ A Python script used to batch delete AWS snapshots matching the supplied criteri
 ## Requirements
 * Python 3
 * boto3
+* awscli

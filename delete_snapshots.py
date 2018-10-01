@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
 import sys
 import boto3
 import argparse
 from datetime import datetime, timedelta, timezone
-#filters = [{'Name':'tag:CreateType', 'Values':['auto']}]
 
+# Define Globals
 VERSION = '0.0.1'
 ARG_HELP ="""
 
@@ -18,6 +19,13 @@ Usage:
 --------------------------------------------------------------------------------
 """.format(VERSION)
 
+################################################################################
+#
+# Function: main
+# Description: This function is responsible for applying the appropriate actions
+# that are passed into the 'args' variable
+#
+################################################################################
 def main(args):
 	session = boto3.Session(profile_name=args.profile)
 	ec2 = session.client('ec2')
@@ -51,15 +59,20 @@ def main(args):
 				ec2.delete_snapshot(SnapshotId=snapshot['SnapshotId'],DryRun=False)
 			else:
 				output("Warning: Snapshot not deleted! (add -d or --delete option)", args)
-			output("Deleted "+str(deletion_counter)+" snapshots totalling "+str(size_counter)+"GB", args)
+	output("Deleted "+str(deletion_counter)+" snapshots totalling "+str(size_counter)+"GB", args)
 
-def output(str_out, level, args):
+################################################################################
+#
+# Function: output
+# Description: Print out the String passed into the function denoted by the
+# parameter 'str_out' unless the parameter 'args.verbose' is set to False
+#
+################################################################################
+def output(str_out, args):
 	if args.verbose == True:
 		print(str_out)
 	else:
 		pass
-
-
 
 ################################################################################
 #
@@ -71,10 +84,9 @@ if __name__ == '__main__':
 		args = argparse.ArgumentParser(description=ARG_HELP, formatter_class=argparse.RawTextHelpFormatter, usage=argparse.SUPPRESS)
 		args.add_argument('--filter','-f', dest='filter', type=str, help="JSON formatted string to filter Snapshots")
 		args.add_argument('--profile','-p', dest='profile', type=str, default="default", help="Profile to use (Default: default)")
-		args.add_argument('--age','-a', dest='age', type=int, help='The max age in days you want to keep (Default: 30)')
+		args.add_argument('--age','-a', dest='age', type=int, help='The max age in days you want to keep')
 		args.add_argument('--delete','-d', dest='delete', action='store_true', help='Specify to delete Snapshots')
 		args.add_argument('--verbose','-v', dest="verbose", action='store_true', help="Show verbose output of program")
-		args.add_argument('--quiet','-q', dest="quiet", action='store_true', help="Run program in quiet mode")
 		args = args.parse_args()
 		# Launch Main
 		main(args)
