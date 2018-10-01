@@ -13,7 +13,6 @@ A Python script used to batch delete AWS snapshots matching the supplied criteri
 * --age , -a : The age in days you want to keep i.e: `--age 7` will delete snapshots older than 7 days old
 * --delete , -d : Specify to delete snapshots, if this option is not supplied the snapshots will not be deleted
 * --verbose , -v : Option to give verbose output
-* --quiet , -q : Option to give no output
 
 ## Requirements
 * Python 3
