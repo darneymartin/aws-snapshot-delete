@@ -1,4 +1,4 @@
-# AWS-Snapshot-Delete
+# aws-snapshot-delete
 A Python script used to batch delete AWS snapshots matching the supplied criteria.
 
 ## Usage Examples
