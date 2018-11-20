@@ -42,10 +42,11 @@ def main(args):
     else:
         snapshots = ec2.describe_snapshots()
 
+
     delete_snapshots = []
     # Check if age parameter is defined
     if args.age is not None:
-        output("Deleting any snapshots older than "+str(args.age)+" days", args)
+        output("Deleting any snapshots older than "+str(args.age)+" days", "", args)
         delete_time = datetime.now(timezone.utc) - timedelta(days=args.age)
         for snapshot in snapshots["Snapshots"]:
             start_time = snapshot['StartTime']
@@ -61,11 +62,11 @@ def main(args):
             deletion_counter = deletion_counter + 1
             size_counter = size_counter + snapshot['VolumeSize']
             if args.delete is True:
-                output("Deleting "+ str(snapshot['SnapshotId']), args)
+                output("Deleting "+ str(snapshot['SnapshotId']),"Description:"+str(snapshot['Description']), args)
                 ec2.delete_snapshot(SnapshotId=snapshot['SnapshotId'],DryRun=False)
             else:
-                output("Warning: Snapshot "+ str(snapshot['SnapshotId']) +" not deleted! (add -d or --delete option)", args)
-    output("Deleted "+str(deletion_counter)+" snapshots totalling "+str(size_counter)+"GB", args)
+                output("Warning: Snapshot "+ str(snapshot['SnapshotId']) +" not deleted! (add -d or --delete option)", "Description:"+str(snapshot['Description']), args)
+    output("Deleted "+str(deletion_counter)+" snapshots totalling "+str(size_counter)+"GB", "", args)
 
 ################################################################################
 #
@@ -74,8 +75,10 @@ def main(args):
 # parameter 'str_out' unless the parameter 'args.verbose' is set to False
 #
 ################################################################################
-def output(str_out, args):
+def output(str_out, verbose, args):
     if args.verbose == True:
+        print(str_out+" "+verbose)
+    else:
         print(str_out)
 
 ################################################################################
