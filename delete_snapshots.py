@@ -33,16 +33,13 @@ def main(args):
     snapshots = ec2.describe_snapshots(**args.filter)
 
     delete_snapshots = []
-    # Check if age parameter is defined
-    if args.age is not None:
-        print("Deleting any snapshots older than {0} days".format(args.age))
-        delete_time = datetime.now(timezone.utc) - timedelta(days=args.age)
-        for snapshot in snapshots["Snapshots"]:
-            start_time = snapshot['StartTime']
-            if start_time < delete_time:
-                delete_snapshots.append(snapshot)
-    else:
-        delete_snapshots = snapshots
+
+    print("Deleting any snapshots older than {0} days".format(args.age))
+    delete_time = datetime.now(timezone.utc) - timedelta(days=args.age)
+    for snapshot in snapshots["Snapshots"]:
+        start_time = snapshot['StartTime']
+        if start_time < delete_time:
+            delete_snapshots.append(snapshot)
 
     size_counter = 0
     for snapshot in delete_snapshots:
