@@ -23,33 +23,28 @@ class JsonAction(argparse.Action):
     """
 
     def __call__(self, parser, namespace, value, option_string=None):
-        value = {"Filter": json.loads(value)}
+        value = {"Filters": json.loads(value)}
         setattr(namespace, self.dest, value)
 
 def main(args):
     session = boto3.Session(profile_name=args.profile)
     ec2 = session.client('ec2')
-
     snapshots = ec2.describe_snapshots(**args.filter)
-
-    delete_snapshots = []
-
     print("Deleting any snapshots older than {0} days".format(args.age))
     delete_time = datetime.now(timezone.utc) - timedelta(days=args.age)
+    size_counter = 0
+    delete_count = 0
     for snapshot in snapshots["Snapshots"]:
         start_time = snapshot['StartTime']
         if start_time < delete_time:
-            delete_snapshots.append(snapshot)
-
-    size_counter = 0
-    for snapshot in delete_snapshots:
-        size_counter = size_counter + snapshot['VolumeSize']
-        if args.delete is True:
-            print("Deleting {0} {1}".format(snapshot['SnapshotId'], "Description: {0}".format(snapshot['Description']) * args.verbose))
-            ec2.delete_snapshot(SnapshotId=snapshot['SnapshotId'],DryRun=False)
-        else:
-            print("Warning: Snapshot {0} not deleted! (add -d or --delete option) {1}".format(snapshot['SnapshotId'], "Description: {0}".format(snapshot['Description']) * args.verbose))
-    print("Deleted {0} snapshots totalling {1}GB".format(len(delete_snapshots), size_counter))
+            size_counter = size_counter + snapshot['VolumeSize']
+            delete_count = delete_count + 1
+            if args.delete is True:
+                print("Deleting {0} {1}".format(snapshot['SnapshotId'], "Description: {0}".format(snapshot['Description']) * args.verbose))
+                ec2.delete_snapshot(SnapshotId=snapshot['SnapshotId'],DryRun=False)
+            else:
+                print("Warning: Snapshot {0} not deleted! (add -d or --delete option) {1}".format(snapshot['SnapshotId'], "Description: {0}".format(snapshot['Description']) * args.verbose))
+    print("Deleted {0} snapshots totalling {1}GB".format(delete_count, size_counter))
 
 ################################################################################
 #
